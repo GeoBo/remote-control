@@ -8,7 +8,7 @@
     "moduleResolution": "node",
     "target": "esnext",
     "module": "esnext",
-    //"allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true,
     //"declaration": true,
     //"declarationMap": true,
     //"composite": true,

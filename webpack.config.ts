@@ -32,6 +32,9 @@ const config: webpack.Configuration = {
             extensions: [`ts`],
             fix: true,
         }),
+        new webpack.DefinePlugin({
+            'process.browser': 'true',
+        }),
     ],
     module: {
         rules: [

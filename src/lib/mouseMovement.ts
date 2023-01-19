@@ -1,5 +1,5 @@
-import { mouse, left, right, up, down, straightTo, Point, Button } from '@nut-tree/nut-js';
-
+import { mouse, left, right, up, down, straightTo, Point, Button, screen, Region } from '@nut-tree/nut-js';
+import Jimp from 'jimp/es';
 //mouse.config.mouseSpeed = 2000;
 
 async function moveMouseLeft(data: string) {
@@ -29,7 +29,7 @@ async function drawCircleMouse(radius: string) {
     const r = Number(radius);
     const presicion = 1000;
     const position = await mouse.getPosition();
-    //await mouse.click(Button.LEFT);
+
     for (let i = 0; i < Math.PI * 2; i += (Math.PI * 2) / presicion) {
         x = position.x + r * Math.sin(i);
         y = position.y + r * Math.cos(i);
@@ -64,6 +64,21 @@ async function drawRectangleMouse(width: string, length: string) {
     await mouse.releaseButton(Button.LEFT);
 }
 
+async function getPrintScreen() {
+    const position = await mouse.getPosition();
+    const clientWidth = 200;
+    const clientHeight = 200;
+
+    const region = new Region(position.x - clientWidth / 2, position.y - clientHeight / 2, clientWidth, clientHeight);
+    const { data, width, height } = await screen.grabRegion(region);
+
+    const jimpObj = new Jimp({ data, width, height });
+    const png64 = await jimpObj.getBase64Async(Jimp.MIME_PNG);
+    const png64short = png64.replace('data:image/png;base64,', '');
+    //console.log(png64short.length);
+    return `prnt_scrn ${png64short}`;
+}
+
 export {
     moveMouseLeft,
     moveMouseRight,
@@ -73,4 +88,5 @@ export {
     drawCircleMouse,
     drawSquareMouse,
     drawRectangleMouse,
+    getPrintScreen,
 };

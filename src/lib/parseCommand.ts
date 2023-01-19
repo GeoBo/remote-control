@@ -3,6 +3,7 @@ import {
     drawRectangleMouse,
     drawSquareMouse,
     getMousePosition,
+    getPrintScreen,
     moveMouseDown,
     moveMouseLeft,
     moveMouseRight,
@@ -39,6 +40,8 @@ async function parseCommand(data: string) {
         case 'draw_rectangle':
             await drawRectangleMouse(value, value2);
             break;
+        case 'prnt_scrn':
+            return getPrintScreen();
         default:
             console.log('Unknown command');
     }
