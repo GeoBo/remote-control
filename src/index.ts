@@ -1,26 +1,31 @@
 import { httpServer } from './http_server/http_server';
 import { WebSocketServer } from 'ws';
-import dotenv from 'dotenv';
+import nodemon from 'nodemon';
 import parseCommand from './lib/parseCommand';
 import { truncateString } from './lib/utils';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const HTTP_PORT = process.env.PORT || 8181;
+const WEBSOCKET_PORT = Number(process.env.WEB_SOCKET_PORT) || 8080;
+console.log(`Start HTTP Server on the ${HTTP_PORT} port! (http://localhost:${HTTP_PORT})`);
 
-console.log(`Start static http server on the ${HTTP_PORT} port!`);
 httpServer.listen(HTTP_PORT);
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: WEBSOCKET_PORT });
+console.log(`Start WebSocket Server on the ${WEBSOCKET_PORT} port! (http://localhost:${WEBSOCKET_PORT})`);
 
 wss.on('connection', (ws) => {
-    console.log('Client connected');
-
+    console.log(`Clients connected: ${wss.clients.size}`);
     ws.on('message', (data) => {
         const command = data.toString();
         console.log(`<- ${command}`);
         parseCommand(command)
             .then((answer) => {
-                if (typeof answer !== 'string') return;
+                if (typeof answer !== 'string') {
+                    ws.send(command);
+                    return;
+                }
                 ws.send(answer);
                 const formatAnswer = truncateString(answer);
                 console.log(`-> ${formatAnswer}`);
@@ -31,4 +36,29 @@ wss.on('connection', (ws) => {
     ws.on('close', function () {
         console.log('Client disconnected');
     });
+});
+
+//hard disconnect clients from web socket
+wss.on('close', () => {
+    console.log('!!!');
+    wss.clients.forEach((socket) => {
+        console.log('!!!');
+        socket.close();
+
+        process.nextTick(() => {
+            if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
+                socket.terminate();
+            }
+        });
+    });
+});
+
+process.on('SIGINT', () => {
+    nodemon.emit('quit');
+    process.exit(0);
+});
+
+process.on('exit', (code) => {
+    nodemon.emit('quit');
+    process.exit(code);
 });

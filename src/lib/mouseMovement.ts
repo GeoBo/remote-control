@@ -1,6 +1,6 @@
 import { mouse, left, right, up, down, straightTo, Point, Button, screen, Region } from '@nut-tree/nut-js';
 import Jimp from 'jimp/es';
-//mouse.config.mouseSpeed = 2000;
+mouse.config.mouseSpeed = 2000;
 
 async function moveMouseLeft(data: string) {
     await mouse.move(left(Number(data)));
@@ -29,7 +29,7 @@ async function drawCircleMouse(radius: string) {
     const r = Number(radius);
     const presicion = 1000;
     const position = await mouse.getPosition();
-
+    mouse.config.mouseSpeed = 10000;
     for (let i = 0; i < Math.PI * 2; i += (Math.PI * 2) / presicion) {
         x = position.x + r * Math.sin(i);
         y = position.y + r * Math.cos(i);
@@ -39,6 +39,7 @@ async function drawCircleMouse(radius: string) {
         }
         await mouse.move(straightTo(new Point(x, y)));
     }
+    mouse.config.mouseSpeed = 2000;
     await mouse.releaseButton(Button.LEFT);
 }
 

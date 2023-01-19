@@ -2,7 +2,7 @@ import * as webpack from 'webpack';
 import { resolve } from 'path';
 import NodemonPlugin from 'nodemon-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
-import ESLintPlugin from 'eslint-webpack-plugin';
+// import ESLintPlugin from 'eslint-webpack-plugin';
 
 const NODE_ENV = process.env.NODE_ENV == 'development' ? 'development' : 'production';
 
@@ -24,14 +24,14 @@ const config: webpack.Configuration = {
             script: './dist/index.js',
             watch: [resolve(__dirname, 'dist')],
             ignore: ['*.js.map'],
-            verbose: true,
+            verbose: false,
+            quiet: true,
             ext: 'js,json',
-            //nodeArgs: ['--inspect'],
         }),
-        new ESLintPlugin({
-            extensions: [`ts`],
-            fix: true,
-        }),
+        // new ESLintPlugin({ //take a long time
+        //     extensions: [`ts`],
+        //     fix: true,
+        // }),
         new webpack.DefinePlugin({
             'process.browser': 'true',
         }),
@@ -43,6 +43,11 @@ const config: webpack.Configuration = {
                 use: ['ts-loader'],
             },
         ],
+    },
+    watchOptions: {
+        aggregateTimeout: 1000,
+        poll: 500,
+        ignored: /node_modules/,
     },
 };
 export default config;
