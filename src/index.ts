@@ -16,8 +16,12 @@ wss.on('connection', (ws) => {
 
     ws.on('message', (data) => {
         const command = data.toString();
-        parseCommand(command);
         console.log(`<- ${command}`);
+        parseCommand(command).then((answer) => {
+            if (typeof answer !== 'string') return;
+            ws.send(answer);
+            console.log(`-> ${answer}`);
+        });
     });
 
     ws.on('close', function () {

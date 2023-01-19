@@ -1,10 +1,19 @@
-import { getMousePosition, moveMouseDown, moveMouseLeft, moveMouseRight, moveMouseUp } from './mouseMovement';
+import {
+    drawCircleMouse,
+    drawRectangleMouse,
+    drawSquareMouse,
+    getMousePosition,
+    moveMouseDown,
+    moveMouseLeft,
+    moveMouseRight,
+    moveMouseUp,
+} from './mouseMovement';
 
 async function parseCommand(data: string) {
     const arr = data.split(' ');
     const command = arr[0];
     const value = arr[1];
-    //const value = arr.slice(1);
+    const value2 = arr[2];
 
     switch (command) {
         case 'mouse_up':
@@ -20,7 +29,15 @@ async function parseCommand(data: string) {
             await moveMouseRight(value);
             break;
         case 'mouse_position':
-            await getMousePosition();
+            return getMousePosition();
+        case 'draw_circle':
+            await drawCircleMouse(value);
+            break;
+        case 'draw_square':
+            await drawSquareMouse(value);
+            break;
+        case 'draw_rectangle':
+            await drawRectangleMouse(value, value2);
             break;
         default:
             console.log('Unknown command');
