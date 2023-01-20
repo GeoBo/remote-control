@@ -3,12 +3,12 @@ import {
     drawRectangleMouse,
     drawSquareMouse,
     getMousePosition,
-    getPrintScreen,
     moveMouseDown,
     moveMouseLeft,
     moveMouseRight,
     moveMouseUp,
 } from './mouseMovement';
+import { getPrintScreen } from './screenControl';
 
 async function parseCommand(data: string) {
     const arr = data.split(' ');

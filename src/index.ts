@@ -1,5 +1,5 @@
 import { httpServer } from './http_server/http_server';
-import { WebSocketServer } from 'ws';
+import { createWebSocketStream, WebSocketServer } from 'ws';
 import nodemon from 'nodemon';
 import parseCommand from './lib/parseCommand';
 import { truncateString } from './lib/utils';
@@ -17,16 +17,25 @@ console.log(`Start WebSocket Server on the ${WEBSOCKET_PORT} port! (http://local
 
 wss.on('connection', (ws) => {
     console.log(`Clients connected: ${wss.clients.size}`);
-    ws.on('message', (data) => {
-        const command = data.toString();
+
+    const duplex = createWebSocketStream(ws, {
+        encoding: 'utf-8',
+        decodeStrings: false,
+        readableObjectMode: true,
+        writableObjectMode: true,
+    });
+
+    duplex.on('data', (chunk) => {
+        const command = chunk.toString();
         console.log(`<- ${command}`);
+
         parseCommand(command)
             .then((answer) => {
                 if (typeof answer !== 'string') {
-                    ws.send(command);
+                    duplex.write(command); //echo
                     return;
                 }
-                ws.send(answer);
+                duplex.write(answer);
                 const formatAnswer = truncateString(answer);
                 console.log(`-> ${formatAnswer}`);
             })
@@ -40,9 +49,7 @@ wss.on('connection', (ws) => {
 
 //hard disconnect clients from web socket
 wss.on('close', () => {
-    console.log('!!!');
     wss.clients.forEach((socket) => {
-        console.log('!!!');
         socket.close();
 
         process.nextTick(() => {
